@@ -32,6 +32,7 @@ const SCHEMA_SELECTION_TYPES: ReadonlySet<ConnectionType> = new Set([
 	ConnectionType.SNOWFLAKE,
 	ConnectionType.KYUUBI,
 	ConnectionType.TRINO,
+	ConnectionType.DREMIO,
 ]);
 
 type FieldValues = Partial<Record<ConnectionFieldKey, string>>;

@@ -17,6 +17,7 @@ from auto_ontology.connectors.base import SQLDatabase
 from auto_ontology.connectors.connection_string_factory import build_connection_string
 from auto_ontology.connectors.clickhouse import ClickHouseDatabase
 from auto_ontology.connectors.databricks import DatabricksDatabase
+from auto_ontology.connectors.dremio import DremioDatabase
 from auto_ontology.connectors.duckdb import DuckDBDatabase
 from auto_ontology.connectors.heavydb import HeavyDBDatabase
 from auto_ontology.connectors.kyuubi import KyuubiDatabase
@@ -53,6 +54,7 @@ CONNECTOR_REGISTRY: dict[str, type[SQLDatabase]] = {
     "kyuubi": KyuubiDatabase,
     "sqlite": SQLiteDatabase,
     "trino": TrinoDatabase,
+    "dremio": DremioDatabase,
 }
 
 _connectors: list[SQLDatabase] | None = None
@@ -138,7 +140,7 @@ def create_connector(
 
     *schemas* is an optional ingestion allowlist. It is only honoured by
     connectors that support schema filtering (currently Databricks, Snowflake,
-    Kyuubi, and Trino); for others it is ignored so their behaviour is unchanged.
+    Kyuubi, Trino, and Dremio); for others it is ignored so their behaviour is unchanged.
 
     *table_filter* is the connection's regex allow/deny pair. Unlike *schemas*
     it applies to every connector, because it is enforced centrally in
@@ -166,6 +168,7 @@ def create_connector(
             SnowflakeDatabase,
             KyuubiDatabase,
             TrinoDatabase,
+            DremioDatabase,
         ):
             connector = connector_class(connection_string, schemas=schemas)
         else:

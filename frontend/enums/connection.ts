@@ -12,6 +12,7 @@ export enum ConnectionType {
 	KYUUBI = 'kyuubi',
 	TRINO = 'trino',
 	CLICKHOUSE = 'clickhouse',
+	DREMIO = 'dremio',
 }
 
 export const connectionDisplayName: Record<ConnectionType, string> = {
@@ -23,6 +24,7 @@ export const connectionDisplayName: Record<ConnectionType, string> = {
 	[ConnectionType.KYUUBI]: 'Apache Kyuubi',
 	[ConnectionType.TRINO]: 'Trino',
 	[ConnectionType.CLICKHOUSE]: 'ClickHouse',
+	[ConnectionType.DREMIO]: 'Dremio',
 };
 
 export const isConnectionType = (value: string | null | undefined): value is ConnectionType =>
@@ -46,6 +48,8 @@ export type ConnectionFieldKey =
 	| 'truststore_password'
 	| 'schema'
 	| 'http_scheme'
+	| 'tls'
+	| 'tls_skip_verify'
 	| 'sso_federation'
 	| 'table_allow_regex'
 	| 'table_deny_regex';
@@ -261,6 +265,37 @@ export const CONNECTION_FIELDS: Record<ConnectionType, ConnectionField[]> = {
 			placeholder: 'http',
 			optional: true,
 			hint: 'Leave empty to infer from the port: https on 443 and 8443, http otherwise. Set https explicitly for a TLS listener on any other port — unlike Trino, a password alone does not imply TLS here.',
+		},
+	],
+	[ConnectionType.DREMIO]: [
+		{ key: 'host', label: 'Host', placeholder: 'dremio.example.com' },
+		{
+			key: 'port',
+			label: 'Port',
+			placeholder: '32010',
+			optional: true,
+			hint: 'The Arrow Flight SQL port, 32010 by default. Not the 9047 web UI port.',
+		},
+		{ key: 'password', label: 'Personal Access Token', secret: true },
+		{
+			key: 'database',
+			label: 'Connection Name',
+			placeholder: 'dremio',
+			hint: 'Dremio has no database level, so this is only the name queries are routed by. Use a distinct name per Dremio connection.',
+		},
+		{
+			key: 'tls',
+			label: 'Use TLS',
+			optional: true,
+			boolean: true,
+			hint: 'Connect over grpc+tls. Leave off for a listener without encryption, which is the Dremio default.',
+		},
+		{
+			key: 'tls_skip_verify',
+			label: 'Skip Certificate Verification',
+			optional: true,
+			boolean: true,
+			hint: 'Accept a self-signed certificate. Only relevant when TLS is on.',
 		},
 	],
 };

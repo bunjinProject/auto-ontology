@@ -7,6 +7,7 @@ from __future__ import annotations
 from auto_ontology.connectors.base import SQLDatabase
 from auto_ontology.connectors.clickhouse import ClickHouseDatabase
 from auto_ontology.connectors.databricks import DatabricksDatabase
+from auto_ontology.connectors.dremio import DremioDatabase
 from auto_ontology.connectors.duckdb import DuckDBDatabase
 from auto_ontology.connectors.heavydb import HeavyDBDatabase
 from auto_ontology.connectors.kyuubi import KyuubiDatabase
@@ -24,6 +25,7 @@ __all__ = [
     "SQLDatabase",
     "ClickHouseDatabase",
     "DatabricksDatabase",
+    "DremioDatabase",
     "DuckDBDatabase",
     "HeavyDBDatabase",
     "KyuubiDatabase",

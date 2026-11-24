@@ -21,6 +21,8 @@ DEFAULT_HEAVYDB_PORT = "6274"
 DEFAULT_KYUUBI_PORT = "10000"
 DEFAULT_TRINO_PORT = "8080"
 DEFAULT_CLICKHOUSE_PORT = "8123"
+DEFAULT_DREMIO_PORT = "32010"
+DEFAULT_DREMIO_NAME = "dremio"
 DEFAULT_HEAVYDB_PROTOCOL = "binary"
 
 
@@ -183,6 +185,38 @@ def build_connection_string(connection: Mapping[str, Any]) -> str:
             params.append(f"http_scheme={_enc(http_scheme)}")
 
         url = f"trino://{credentials}@{host}:{port}/{_enc(catalog)}"
+        if params:
+            url += f"?{'&'.join(params)}"
+        return url
+
+    if conn_type == "dremio":
+        host = _require(connection, "host").rstrip("/")
+        if host.startswith(("https://", "http://")):
+            host = host.split("://", 1)[1]
+        port = str(connection.get("port") or "").strip() or DEFAULT_DREMIO_PORT
+        # The password is the personal access token. The user is a label only, so
+        # it is optional and defaults to a placeholder to keep the URL well formed.
+        token = _require(connection, "password")
+        user = str(connection.get("user") or "").strip() or "token"
+        # Dremio has no database level; ``database`` is just the name NeMo routes
+        # SQL by, so it may be left empty.
+        name = str(connection.get("database") or "").strip() or DEFAULT_DREMIO_NAME
+
+        params = []
+        schema = str(connection.get("schema") or "").strip()
+        if schema:
+            params.append(f"schema={_enc(schema)}")
+        # Flight SQL is plaintext gRPC unless told otherwise.
+        if str(connection.get("tls") or "").strip().lower() in ("1", "true", "yes"):
+            params.append("tls=true")
+        if str(connection.get("tls_skip_verify") or "").strip().lower() in (
+            "1",
+            "true",
+            "yes",
+        ):
+            params.append("tls_skip_verify=true")
+
+        url = f"dremio://{_enc(user)}:{_enc(token)}@{host}:{port}/{_enc(name)}"
         if params:
             url += f"?{'&'.join(params)}"
         return url
